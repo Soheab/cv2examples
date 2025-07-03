@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-readme:
     runs-on: ubuntu-latest
@@ -26,7 +29,7 @@ jobs:
 
         This repository shows examples of Discord's components V2 can be used. Each directory is a user ID of a user to whom the examples belong.
 
-        
+
         EOF
 
         # Find all directories that contain images
