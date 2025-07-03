@@ -46,7 +46,7 @@ jobs:
           image_files=$(find "$dir" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.gif" -o -iname "*.bmp" -o -iname "*.svg" -o -iname "*.webp" \) 2>/dev/null)
           
           if [[ -n "$image_files" ]]; then
-            echo "### User: $dir_name" >> README.md
+            echo "## User: $dir_name" >> README.md
             echo "" >> README.md
             
             # Add each image
@@ -59,7 +59,6 @@ jobs:
               fi
             done <<< "$image_files"
             
-            echo "---" >> README.md
             echo "" >> README.md
           fi
         done
