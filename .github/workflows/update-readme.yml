@@ -1,0 +1,87 @@
+name: Update README with Images
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Update README with images
+      run: |
+        # Start with a fresh README
+        cat > README.md << 'EOF'
+        # CV2 Examples
+
+        This repository shows examples of Discord's components V2 can be used. Each directory is a user ID of a user to whom the examples belong.
+
+        
+        EOF
+
+        # Find all directories that contain images
+        for dir in */; do
+          # Remove trailing slash
+          dir_name=${dir%/}
+          
+          # Skip .git and .github directories
+          if [[ "$dir_name" == ".git" || "$dir_name" == ".github" ]]; then
+            continue
+          fi
+          
+          # Check if directory contains image files
+          image_files=$(find "$dir" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.gif" -o -iname "*.bmp" -o -iname "*.svg" -o -iname "*.webp" \) 2>/dev/null)
+          
+          if [[ -n "$image_files" ]]; then
+            echo "### User: $dir_name" >> README.md
+            echo "" >> README.md
+            
+            # Add each image
+            while IFS= read -r image; do
+              if [[ -n "$image" ]]; then
+                image_name=$(basename "$image")
+                echo "#### $image_name" >> README.md
+                echo "![${image_name}](${image})" >> README.md
+                echo "" >> README.md
+              fi
+            done <<< "$image_files"
+            
+            echo "---" >> README.md
+            echo "" >> README.md
+          fi
+        done
+
+        # Remove the last separator if it exists
+        if [[ $(tail -2 README.md | head -1) == "---" ]]; then
+          head -n -2 README.md > temp.md && mv temp.md README.md
+        fi
+
+        echo "" >> README.md
+
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if git diff --quiet README.md; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "Auto-update README.md with images from directories"
+        git push
