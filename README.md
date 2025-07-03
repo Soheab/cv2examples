@@ -9,7 +9,7 @@ This repository shows examples of Discord's components V2 can be used. Each dire
 ![pollbuilder.png](150665783268212746/pollbuilder.png)
 
 
-## User: [451848182327148554](discord://-/users/451848182327148554)
+## User: 451848182327148554
 
 #### image2.png
 ![image2.png](451848182327148554/image2.png)
